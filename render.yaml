@@ -1,0 +1,26 @@
+databases:
+  - name: doublecranch-db
+    databaseName: ranch_portal
+    user: ranch_user
+    plan: free
+
+services:
+  - type: web
+    name: doublecranch-portal
+    runtime: python
+    plan: free
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn ranch_portal.wsgi:application"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: doublecranch-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: False
+      - key: ALLOWED_HOSTS
+        value: "*"
+      - key: PYTHON_VERSION
+        value: 3.11.0
