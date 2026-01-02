@@ -1,7 +1,7 @@
 /* Double C Ranch Portal - Custom Styles */
 
 :root {
-    --primary-color: #2c5530;
+    --primary-color: #800000;
     --secondary-color: #8b4513;
     --accent-color: #d4af37;
 }
@@ -35,8 +35,8 @@ main {
 }
 
 .btn-primary:hover {
-    background-color: #1e3d21;
-    border-color: #1e3d21;
+    background-color: #5c0000;
+    border-color: #5c0000;
 }
 
 .text-primary {
