@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}Check In - Double C Ranch{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row my-4">
+        <div class="col-12">
+            <h2>Check In</h2>
+            <p class="text-muted">Submit your check-in for today's activity</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">New Check-In</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            {{ form.type.label_tag }}
+                            {{ form.type }}
+                            {% if form.type.errors %}
+                                <div class="text-danger">{{ form.type.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.student_note.label_tag }}
+                            {{ form.student_note }}
+                            {% if form.student_note.errors %}
+                                <div class="text-danger">{{ form.student_note.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i>
+                            <small>Your check-in will be reviewed and approved by staff.</small>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-check-circle"></i> Submit Check-In
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Check-Ins</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_checkins %}
+                    <div class="list-group list-group-flush">
+                        {% for checkin in recent_checkins %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">{{ checkin.type }}</h6>
+                                    <p class="mb-1 small text-muted">
+                                        Requested: {{ checkin.requested_at|date:"M d, Y g:i A" }}
+                                    </p>
+                                    {% if checkin.confirmed_at %}
+                                    <p class="mb-1 small text-muted">
+                                        Confirmed: {{ checkin.confirmed_at|date:"M d, Y g:i A" }}
+                                    </p>
+                                    {% endif %}
+                                    {% if checkin.student_note %}
+                                    <p class="mb-1 small"><em>"{{ checkin.student_note }}"</em></p>
+                                    {% endif %}
+                                    {% if checkin.staff_note %}
+                                    <p class="mb-1 small text-info">
+                                        <i class="bi bi-chat-left-text"></i> Staff: {{ checkin.staff_note }}
+                                    </p>
+                                    {% endif %}
+                                    {% if checkin.instructor %}
+                                    <p class="mb-0 small">
+                                        <i class="bi bi-person"></i> Instructor: {{ checkin.instructor.get_full_name }}
+                                    </p>
+                                    {% endif %}
+                                </div>
+                                <span class="badge badge-{{ checkin.status|lower }}">{{ checkin.status }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No check-ins yet. Submit your first check-in!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5><i class="bi bi-info-circle"></i> Check-In Information</h5>
+                    <ul class="mb-0">
+                        <li>Check in when you arrive for your scheduled lesson or activity</li>
+                        <li>Staff will review and approve your check-in</li>
+                        <li>Check-ins help us track attendance and progress</li>
+                        <li>If you have any questions or special requests, add them in the note field</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

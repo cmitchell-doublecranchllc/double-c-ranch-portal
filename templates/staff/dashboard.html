@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block title %}Staff Dashboard - Double C Ranch{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row my-4">
+        <div class="col-12">
+            <h2>Staff Dashboard</h2>
+            <p class="text-muted">Manage members, check-ins, and goals</p>
+        </div>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card stat-card warning">
+                <div class="card-body text-center">
+                    <h3 class="display-4">{{ pending_members }}</h3>
+                    <p class="mb-0">Pending Member Approvals</p>
+                    <a href="{% url 'staff_members' %}?status=Pending" class="btn btn-light btn-sm mt-2">Review</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card info">
+                <div class="card-body text-center">
+                    <h3 class="display-4">{{ pending_checkins }}</h3>
+                    <p class="mb-0">Pending Check-ins</p>
+                    <a href="{% url 'staff_checkins' %}" class="btn btn-light btn-sm mt-2">Review</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card success">
+                <div class="card-body text-center">
+                    <h3 class="display-4">{{ open_goal_requests }}</h3>
+                    <p class="mb-0">Open Goal Requests</p>
+                    <a href="/admin/members/goalrequest/" class="btn btn-light btn-sm mt-2">Review</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Quick Actions</h5>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="{% url 'staff_members' %}" class="btn btn-primary">
+                            <i class="bi bi-people"></i> Manage Members
+                        </a>
+                        <a href="{% url 'staff_checkins' %}" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Check-ins
+                        </a>
+                        <a href="/admin/members/goal/" class="btn btn-info">
+                            <i class="bi bi-trophy"></i> Goals
+                        </a>
+                        <a href="/admin/members/note/" class="btn btn-warning">
+                            <i class="bi bi-journal-text"></i> Notes
+                        </a>
+                        <a href="/admin/" class="btn btn-secondary">
+                            <i class="bi bi-gear"></i> Admin Panel
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Check-ins -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Check-ins</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_checkins %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Member</th>
+                                    <th>Type</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for checkin in recent_checkins %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'staff_member_detail' checkin.member.id %}">
+                                            {{ checkin.member.full_name }}
+                                        </a>
+                                    </td>
+                                    <td>{{ checkin.type }}</td>
+                                    <td><small>{{ checkin.requested_at|date:"M d, g:i A" }}</small></td>
+                                    <td><span class="badge badge-{{ checkin.status|lower }}">{{ checkin.status }}</span></td>
+                                    <td>
+                                        {% if checkin.status == 'Pending' %}
+                                        <a href="{% url 'staff_approve_checkin' checkin.id %}" 
+                                           class="btn btn-sm btn-success">Approve</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No recent check-ins.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Members -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Members</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_members %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Tier</th>
+                                    <th>Status</th>
+                                    <th>Joined</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for member in recent_members %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'staff_member_detail' member.id %}">
+                                            {{ member.full_name }}
+                                        </a>
+                                    </td>
+                                    <td><small>{{ member.membership_tier }}</small></td>
+                                    <td><span class="badge status-{{ member.status|lower }}">{{ member.status }}</span></td>
+                                    <td><small>{{ member.created_at|date:"M d, Y" }}</small></td>
+                                    <td>
+                                        {% if member.status == 'Pending' %}
+                                        <a href="{% url 'staff_approve_member' member.id %}" 
+                                           class="btn btn-sm btn-success">Approve</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No recent members.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

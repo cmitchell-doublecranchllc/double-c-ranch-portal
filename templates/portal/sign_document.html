@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Document - Double C Ranch{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center my-5">
+        <div class="col-lg-10">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Document Signature Required</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Progress:</strong> Document {{ total|add:"-"|add:remaining|add:"1" }} of {{ total }}
+                    </div>
+                    
+                    <h3 class="mb-4">{{ document.name }}</h3>
+                    
+                    <!-- Document Content -->
+                    <div class="document-content mb-4">
+                        {{ document.content|linebreaks }}
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Important:</strong> By signing below, you acknowledge that you have read, understood, and agree to all terms and conditions in this document. Electronic signatures are legally binding.
+                    </div>
+                    
+                    <!-- Signature Form -->
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="signature-box mb-4">
+                            <h5>Electronic Signature</h5>
+                            <p class="text-muted">Type your full legal name below to sign this document electronically.</p>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.signed_name.label_tag }}
+                            {{ form.signed_name }}
+                            {% if form.signed_name.errors %}
+                                <div class="text-danger">{{ form.signed_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.signed_for_name.label_tag }}
+                            {{ form.signed_for_name }}
+                            <small class="form-text text-muted">If you are a parent/guardian signing for a minor</small>
+                            {% if form.signed_for_name.errors %}
+                                <div class="text-danger">{{ form.signed_for_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.relationship.label_tag }}
+                            {{ form.relationship }}
+                            <small class="form-text text-muted">E.g., Parent, Guardian, etc.</small>
+                            {% if form.relationship.errors %}
+                                <div class="text-danger">{{ form.relationship.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-check mb-4">
+                            {{ form.agree }}
+                            <label class="form-check-label" for="{{ form.agree.id_for_label }}">
+                                {{ form.agree.label }}
+                            </label>
+                            {% if form.agree.errors %}
+                                <div class="text-danger">{{ form.agree.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-pen"></i> Sign Document
+                            </button>
+                            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                                Cancel (Sign Later)
+                            </a>
+                        </div>
+                    </form>
+                    
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <small class="text-muted">
+                            <strong>Legal Notice:</strong> Your signature will be recorded along with your IP address, timestamp, and device information for legal compliance and audit purposes. This document snapshot will be permanently stored as part of your membership record.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

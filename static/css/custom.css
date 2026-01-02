@@ -1,0 +1,159 @@
+/* Double C Ranch Portal - Custom Styles */
+
+:root {
+    --primary-color: #2c5530;
+    --secondary-color: #8b4513;
+    --accent-color: #d4af37;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+}
+
+.card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: #1e3d21;
+    border-color: #1e3d21;
+}
+
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+
+/* Dashboard Styles */
+.dashboard-card {
+    border-left: 4px solid var(--primary-color);
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.stat-card.success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+.stat-card.warning {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.stat-card.info {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+/* Check-in Badge */
+.badge-pending {
+    background-color: #ffc107;
+}
+
+.badge-confirmed {
+    background-color: #28a745;
+}
+
+.badge-rejected {
+    background-color: #dc3545;
+}
+
+/* Goal Status */
+.goal-not-started {
+    border-left: 4px solid #6c757d;
+}
+
+.goal-in-progress {
+    border-left: 4px solid #0dcaf0;
+}
+
+.goal-complete {
+    border-left: 4px solid #198754;
+}
+
+/* Document Signing */
+.document-content {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    font-size: 0.9rem;
+}
+
+.signature-box {
+    border: 2px dashed #6c757d;
+    padding: 2rem;
+    text-align: center;
+    background-color: #f8f9fa;
+}
+
+/* Member Status Badges */
+.status-pending {
+    background-color: #ffc107;
+}
+
+.status-approved {
+    background-color: #28a745;
+}
+
+.status-disabled {
+    background-color: #dc3545;
+}
+
+/* Attendance Stats */
+.attendance-chart {
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+/* Notes */
+.note-student-visible {
+    border-left: 4px solid #0dcaf0;
+}
+
+.note-staff-only {
+    border-left: 4px solid #dc3545;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+    
+    .display-4 {
+        font-size: 2.5rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    .navbar, footer, .btn {
+        display: none;
+    }
+}

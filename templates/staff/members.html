@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Members - Staff - Double C Ranch{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row my-4">
+        <div class="col-12">
+            <h2>Member Management</h2>
+            <p class="text-muted">Search, filter, and manage all members</p>
+        </div>
+    </div>
+    
+    <!-- Search and Filter -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            {{ form.query }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.status }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.membership_tier }}
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-search"></i> Search
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Members Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Members ({{ members.count }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if members %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Tier</th>
+                                    <th>Status</th>
+                                    <th>Attendance</th>
+                                    <th>Last Check-in</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for member in members %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'staff_member_detail' member.id %}">
+                                            <strong>{{ member.full_name }}</strong>
+                                        </a>
+                                        {% if member.parent_name %}
+                                        <br><small class="text-muted">Parent: {{ member.parent_name }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ member.user.email|default:"-" }}</td>
+                                    <td>{{ member.phone }}</td>
+                                    <td><span class="badge bg-secondary">{{ member.membership_tier }}</span></td>
+                                    <td><span class="badge status-{{ member.status|lower }}">{{ member.status }}</span></td>
+                                    <td class="text-center">{{ member.attendance_all_time }}</td>
+                                    <td>
+                                        {% if member.last_checkin_at %}
+                                        <small>{{ member.last_checkin_at|date:"M d, Y" }}</small>
+                                        {% else %}
+                                        <small class="text-muted">Never</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'staff_member_detail' member.id %}" 
+                                               class="btn btn-outline-primary" title="View Details">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            {% if member.status == 'Pending' %}
+                                            <a href="{% url 'staff_approve_member' member.id %}" 
+                                               class="btn btn-outline-success" title="Approve">
+                                                <i class="bi bi-check-circle"></i>
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No members found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

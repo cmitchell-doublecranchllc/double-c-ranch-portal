@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block title %}My Goals - Double C Ranch{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row my-4">
+        <div class="col-12">
+            <h2>My Goals</h2>
+            <p class="text-muted">Track your riding progress and achievements</p>
+        </div>
+    </div>
+    
+    <!-- Active Goals -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Active Goals</h5>
+                </div>
+                <div class="card-body">
+                    {% if member_goals %}
+                    {% for goal in member_goals %}
+                    <div class="card mb-3 goal-{{ goal.status|lower }}">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h5>{{ goal.title }}</h5>
+                                    {% if goal.description %}
+                                    <p class="mb-2">{{ goal.description }}</p>
+                                    {% endif %}
+                                    <p class="mb-1 small text-muted">
+                                        <i class="bi bi-calendar"></i> Created: {{ goal.created_at|date:"M d, Y" }}
+                                        {% if goal.target_date %}
+                                        | Target: {{ goal.target_date|date:"M d, Y" }}
+                                        {% endif %}
+                                    </p>
+                                    <p class="mb-0 small text-muted">
+                                        <i class="bi bi-person"></i> Created by: {{ goal.created_by.get_full_name }}
+                                    </p>
+                                </div>
+                                <span class="badge bg-{{ goal.status|lower }}">{{ goal.get_status_display }}</span>
+                            </div>
+                            
+                            {% if goal.updates.all %}
+                            <hr>
+                            <h6>Progress Updates:</h6>
+                            <div class="list-group list-group-flush">
+                                {% for update in goal.updates.all|slice:":3" %}
+                                <div class="list-group-item px-0">
+                                    <div class="d-flex justify-content-between">
+                                        <small class="text-muted">
+                                            <i class="bi bi-person-circle"></i> {{ update.author.get_full_name }}
+                                            ({{ update.author_type }})
+                                        </small>
+                                        <small class="text-muted">{{ update.created_at|date:"M d, Y" }}</small>
+                                    </div>
+                                    <p class="mb-0 mt-1">{{ update.note }}</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-muted">No goals yet. Request a goal below!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Request New Goal -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Request a New Goal</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            {{ form.content.label_tag }}
+                            {{ form.content }}
+                            {% if form.content.errors %}
+                                <div class="text-danger">{{ form.content.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.timeframe.label_tag }}
+                            {{ form.timeframe }}
+                            {% if form.timeframe.errors %}
+                                <div class="text-danger">{{ form.timeframe.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i>
+                            <small>Staff will review your request and create an official goal for you.</small>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-plus-circle"></i> Submit Goal Request
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Goal Requests -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">My Goal Requests</h5>
+                </div>
+                <div class="card-body">
+                    {% if goal_requests %}
+                    <div class="list-group list-group-flush">
+                        {% for request in goal_requests %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <p class="mb-1">{{ request.content }}</p>
+                                    <small class="text-muted">
+                                        Timeframe: {{ request.timeframe }}
+                                        <br>
+                                        Submitted: {{ request.created_at|date:"M d, Y" }}
+                                    </small>
+                                </div>
+                                <span class="badge bg-{{ request.status|lower }}">{{ request.status }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No goal requests yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Goal Information -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5><i class="bi bi-trophy"></i> About Goals</h5>
+                    <p class="mb-0">
+                        Goals help you track your progress as a rider. You can request goals at any time, and your instructors will work with you to create achievable objectives. Goals can be related to riding skills, horsemanship knowledge, Pony Club certifications, or any aspect of your equestrian journey.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

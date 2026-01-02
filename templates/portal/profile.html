@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - Double C Ranch{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row my-4">
+        <div class="col-12">
+            <h2>My Profile</h2>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Personal Information</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th>Name:</th>
+                            <td>{{ member.full_name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Email:</th>
+                            <td>{{ user.email }}</td>
+                        </tr>
+                        <tr>
+                            <th>Phone:</th>
+                            <td>{{ member.phone }}</td>
+                        </tr>
+                        {% if member.parent_name %}
+                        <tr>
+                            <th>Parent/Guardian:</th>
+                            <td>{{ member.parent_name }}</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Membership Details</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th>Status:</th>
+                            <td><span class="badge status-{{ member.status|lower }}">{{ member.status }}</span></td>
+                        </tr>
+                        <tr>
+                            <th>Membership Tier:</th>
+                            <td>{{ member.get_membership_tier_display }}</td>
+                        </tr>
+                        <tr>
+                            <th>Certification Level:</th>
+                            <td>{{ member.certification_level|default:"None" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Member Since:</th>
+                            <td>{{ member.created_at|date:"F d, Y" }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Signed Documents</h5>
+                </div>
+                <div class="card-body">
+                    {% if signed_docs %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Document</th>
+                                    <th>Signed By</th>
+                                    <th>Date Signed</th>
+                                    <th>IP Address</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for signed_doc in signed_docs %}
+                                <tr>
+                                    <td>{{ signed_doc.document.name }}</td>
+                                    <td>
+                                        {{ signed_doc.signed_name }}
+                                        {% if signed_doc.signed_for_name %}
+                                        <br><small class="text-muted">for {{ signed_doc.signed_for_name }} ({{ signed_doc.relationship }})</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ signed_doc.signed_at|date:"M d, Y g:i A" }}</td>
+                                    <td><small>{{ signed_doc.ip_address }}</small></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No documents signed yet.</p>
+                    <a href="{% url 'sign_documents' %}" class="btn btn-primary">Sign Required Documents</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Attendance Statistics</h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="row">
+                        <div class="col-6">
+                            <h3 class="display-4">{{ member.attendance_30d }}</h3>
+                            <p class="text-muted">Last 30 Days</p>
+                        </div>
+                        <div class="col-6">
+                            <h3 class="display-4">{{ member.attendance_all_time }}</h3>
+                            <p class="text-muted">All Time</p>
+                        </div>
+                    </div>
+                    {% if member.last_checkin_at %}
+                    <hr>
+                    <p class="mb-0"><strong>Last Check-in:</strong> {{ member.last_checkin_at|date:"M d, Y g:i A" }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Quick Links</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                        {% if member.status == 'Approved' %}
+                        <a href="{% url 'checkin' %}" class="btn btn-outline-success">
+                            <i class="bi bi-check-circle"></i> Check In
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'goals' %}" class="btn btn-outline-info">
+                            <i class="bi bi-trophy"></i> My Goals
+                        </a>
+                        <a href="https://app.acuityscheduling.com/catalog.php?owner=36970923&action=addCart&clear=1&id=2073271" 
+                           target="_blank" class="btn btn-outline-warning">
+                            <i class="bi bi-calendar"></i> Schedule Lesson
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

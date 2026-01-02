@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Check-ins - Staff - Double C Ranch{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row my-4">
+        <div class="col-12">
+            <h2>Check-in Management</h2>
+            <p class="text-muted">Review and approve member check-ins</p>
+        </div>
+    </div>
+    
+    <!-- Check-ins Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Check-ins</h5>
+                </div>
+                <div class="card-body">
+                    {% if checkins %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Member</th>
+                                    <th>Type</th>
+                                    <th>Requested</th>
+                                    <th>Confirmed</th>
+                                    <th>Status</th>
+                                    <th>Student Note</th>
+                                    <th>Staff Note</th>
+                                    <th>Instructor</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for checkin in checkins %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'staff_member_detail' checkin.member.id %}">
+                                            {{ checkin.member.full_name }}
+                                        </a>
+                                    </td>
+                                    <td>{{ checkin.type }}</td>
+                                    <td><small>{{ checkin.requested_at|date:"M d, g:i A" }}</small></td>
+                                    <td>
+                                        {% if checkin.confirmed_at %}
+                                        <small>{{ checkin.confirmed_at|date:"M d, g:i A" }}</small>
+                                        {% else %}
+                                        <small class="text-muted">-</small>
+                                        {% endif %}
+                                    </td>
+                                    <td><span class="badge badge-{{ checkin.status|lower }}">{{ checkin.status }}</span></td>
+                                    <td><small>{{ checkin.student_note|default:"-" }}</small></td>
+                                    <td><small>{{ checkin.staff_note|default:"-" }}</small></td>
+                                    <td>
+                                        {% if checkin.instructor %}
+                                        <small>{{ checkin.instructor.get_full_name }}</small>
+                                        {% else %}
+                                        <small class="text-muted">-</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if checkin.status == 'Pending' %}
+                                        <a href="{% url 'staff_approve_checkin' checkin.id %}" 
+                                           class="btn btn-sm btn-success">
+                                            <i class="bi bi-check-circle"></i> Approve
+                                        </a>
+                                        {% else %}
+                                        <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No check-ins yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

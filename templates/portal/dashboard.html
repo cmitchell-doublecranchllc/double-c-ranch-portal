@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Double C Ranch{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row my-4">
+        <div class="col-12">
+            <h2>Welcome, {{ member.first_name }}!</h2>
+            <p class="text-muted">Member Dashboard</p>
+        </div>
+    </div>
+    
+    {% if needs_documents %}
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle"></i>
+        <strong>Action Required:</strong> You need to sign required documents.
+        <a href="{% url 'sign_documents' %}" class="btn btn-sm btn-warning ms-2">Sign Documents</a>
+    </div>
+    {% endif %}
+    
+    {% if member.status == 'Pending' %}
+    <div class="alert alert-info">
+        <i class="bi bi-clock"></i>
+        <strong>Membership Status:</strong> Your membership is pending approval by staff.
+    </div>
+    {% endif %}
+    
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <div class="card-body text-center">
+                    <h3 class="display-4">{{ member.attendance_all_time }}</h3>
+                    <p class="mb-0">Total Check-ins</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card success">
+                <div class="card-body text-center">
+                    <h3 class="display-4">{{ active_goals.count }}</h3>
+                    <p class="mb-0">Active Goals</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card warning">
+                <div class="card-body text-center">
+                    <h3 class="display-4">{{ member.membership_tier }}</h3>
+                    <p class="mb-0">Membership Tier</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card info">
+                <div class="card-body text-center">
+                    <h3 class="display-4">
+                        <span class="badge status-{{ member.status|lower }}">{{ member.status }}</span>
+                    </h3>
+                    <p class="mb-0">Status</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Quick Actions</h5>
+                    <div class="d-flex gap-2 flex-wrap">
+                        {% if member.status == 'Approved' %}
+                        <a href="{% url 'checkin' %}" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Check In
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'goals' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-trophy"></i> View Goals
+                        </a>
+                        <a href="{% url 'profile' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-person"></i> My Profile
+                        </a>
+                        <a href="https://app.acuityscheduling.com/catalog.php?owner=36970923&action=addCart&clear=1&id=2073271" 
+                           target="_blank" class="btn btn-outline-success">
+                            <i class="bi bi-calendar"></i> Schedule Lesson
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Check-ins -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Check-ins</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_checkins %}
+                    <div class="list-group list-group-flush">
+                        {% for checkin in recent_checkins %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ checkin.type }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ checkin.requested_at|date:"M d, Y g:i A" }}</small>
+                                </div>
+                                <span class="badge badge-{{ checkin.status|lower }}">{{ checkin.status }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No check-ins yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Active Goals -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Active Goals</h5>
+                </div>
+                <div class="card-body">
+                    {% if active_goals %}
+                    <div class="list-group list-group-flush">
+                        {% for goal in active_goals %}
+                        <div class="list-group-item goal-{{ goal.status|lower }}">
+                            <strong>{{ goal.title }}</strong>
+                            <br>
+                            <small class="text-muted">
+                                Status: {{ goal.get_status_display }}
+                                {% if goal.target_date %}
+                                | Target: {{ goal.target_date|date:"M d, Y" }}
+                                {% endif %}
+                            </small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No active goals. <a href="{% url 'goals' %}">Request a goal</a></p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Notes -->
+    {% if recent_notes %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Notes from Instructors</h5>
+                </div>
+                <div class="card-body">
+                    {% for note in recent_notes %}
+                    <div class="card mb-2 note-{{ note.visibility|lower }}">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <strong>{{ note.get_category_display }}</strong>
+                                <small class="text-muted">{{ note.created_at|date:"M d, Y" }}</small>
+                            </div>
+                            <p class="mb-0 mt-2">{{ note.content }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

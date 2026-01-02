@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ member.full_name }} - Staff - Double C Ranch{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row my-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'staff_dashboard' %}">Staff</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'staff_members' %}">Members</a></li>
+                    <li class="breadcrumb-item active">{{ member.full_name }}</li>
+                </ol>
+            </nav>
+            <h2>{{ member.full_name }}</h2>
+        </div>
+    </div>
+    
+    <!-- Member Info -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Member Information</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm table-borderless">
+                        <tr>
+                            <th>Status:</th>
+                            <td><span class="badge status-{{ member.status|lower }}">{{ member.status }}</span></td>
+                        </tr>
+                        <tr>
+                            <th>Email:</th>
+                            <td>{{ member.user.email|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Phone:</th>
+                            <td>{{ member.phone }}</td>
+                        </tr>
+                        <tr>
+                            <th>Parent/Guardian:</th>
+                            <td>{{ member.parent_name|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Membership Tier:</th>
+                            <td>{{ member.get_membership_tier_display }}</td>
+                        </tr>
+                        <tr>
+                            <th>Certification:</th>
+                            <td>{{ member.certification_level|default:"None" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Member Since:</th>
+                            <td>{{ member.created_at|date:"F d, Y" }}</td>
+                        </tr>
+                    </table>
+                    
+                    {% if member.status == 'Pending' %}
+                    <div class="d-grid mt-3">
+                        <a href="{% url 'staff_approve_member' member.id %}" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Approve Member
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Attendance Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <h3 class="display-4">{{ member.attendance_30d }}</h3>
+                            <p class="text-muted">Last 30 Days</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h3 class="display-4">{{ member.attendance_all_time }}</h3>
+                            <p class="text-muted">All Time</p>
+                        </div>
+                        <div class="col-md-4">
+                            {% if member.last_checkin_at %}
+                            <h6 class="mt-3">Last Check-in</h6>
+                            <p class="text-muted">{{ member.last_checkin_at|date:"M d, Y" }}</p>
+                            {% else %}
+                            <h6 class="mt-3">Last Check-in</h6>
+                            <p class="text-muted">Never</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Check-ins -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Check-in History</h5>
+                </div>
+                <div class="card-body">
+                    {% if checkins %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Student Note</th>
+                                    <th>Staff Note</th>
+                                    <th>Instructor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for checkin in checkins %}
+                                <tr>
+                                    <td><small>{{ checkin.requested_at|date:"M d, Y g:i A" }}</small></td>
+                                    <td>{{ checkin.type }}</td>
+                                    <td><span class="badge badge-{{ checkin.status|lower }}">{{ checkin.status }}</span></td>
+                                    <td><small>{{ checkin.student_note|default:"-" }}</small></td>
+                                    <td><small>{{ checkin.staff_note|default:"-" }}</small></td>
+                                    <td><small>{{ checkin.instructor.get_full_name|default:"-" }}</small></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No check-ins yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Goals -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Goals</h5>
+                </div>
+                <div class="card-body">
+                    {% if goals %}
+                    {% for goal in goals %}
+                    <div class="card mb-2 goal-{{ goal.status|lower }}">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6>{{ goal.title }}</h6>
+                                    <p class="mb-1 small">{{ goal.description }}</p>
+                                    <small class="text-muted">
+                                        Target: {{ goal.target_date|date:"M d, Y"|default:"Not set" }}
+                                    </small>
+                                </div>
+                                <span class="badge">{{ goal.get_status_display }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-muted">No goals yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notes -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Notes</h5>
+                </div>
+                <div class="card-body">
+                    {% if notes %}
+                    {% for note in notes %}
+                    <div class="card mb-2 note-{{ note.visibility|lower }}">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <strong>{{ note.get_category_display }}</strong>
+                                <div>
+                                    <span class="badge bg-{{ note.visibility|lower }}">{{ note.visibility }}</span>
+                                    <small class="text-muted ms-2">{{ note.created_at|date:"M d, Y" }}</small>
+                                </div>
+                            </div>
+                            <p class="mb-1 mt-2">{{ note.content }}</p>
+                            <small class="text-muted">By: {{ note.author.get_full_name }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-muted">No notes yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Signed Documents -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Signed Documents</h5>
+                </div>
+                <div class="card-body">
+                    {% if signed_docs %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Document</th>
+                                    <th>Signed By</th>
+                                    <th>Date</th>
+                                    <th>IP Address</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for doc in signed_docs %}
+                                <tr>
+                                    <td>{{ doc.document.name }}</td>
+                                    <td>
+                                        {{ doc.signed_name }}
+                                        {% if doc.signed_for_name %}
+                                        <br><small>for {{ doc.signed_for_name }} ({{ doc.relationship }})</small>
+                                        {% endif %}
+                                    </td>
+                                    <td><small>{{ doc.signed_at|date:"M d, Y g:i A" }}</small></td>
+                                    <td><small>{{ doc.ip_address }}</small></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No documents signed yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
