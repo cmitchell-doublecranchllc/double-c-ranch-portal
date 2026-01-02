@@ -47,7 +47,12 @@ def is_admin(user):
 def home(request):
     """Landing page"""
     if request.user.is_authenticated:
-        return redirect('dashboard')
+        # Check if user has a member profile
+        if hasattr(request.user, 'member_profile'):
+            return redirect('dashboard')
+        # If admin/staff without member profile, redirect to admin
+        elif request.user.is_staff or request.user.is_superuser:
+            return redirect('/admin/')
     return render(request, 'portal/home.html')
 
 
@@ -96,11 +101,16 @@ def register(request):
 @login_required
 def dashboard(request):
     """Member dashboard"""
-    try:
-        member = request.user.member_profile
-    except:
-        messages.error(request, 'Member profile not found.')
-        return redirect('home')
+    # Check if user has member profile
+    if not hasattr(request.user, 'member_profile'):
+        messages.error(request, 'Member profile not found. Please contact an administrator.')
+        # If staff/admin, redirect to admin panel
+        if request.user.is_staff or request.user.is_superuser:
+            return redirect('/admin/')
+        # Otherwise show error on home page
+        return render(request, 'portal/home.html')
+    
+    member = request.user.member_profile
     
     # Get recent check-ins
     recent_checkins = member.checkins.all()[:5]
